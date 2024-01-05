@@ -1,6 +1,5 @@
 package com.example.splitandtipcalculator.components
 
-
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons

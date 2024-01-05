@@ -100,10 +100,10 @@ private fun TopHeader(perPersonValue: Double = 0.0) {
 
             //variable create for format maintain 2 number after a decimal
 
-            val formateddata = "%.2f".format(perPersonValue)
+            val formattedData = "%.2f".format(perPersonValue)
 
             Text(
-                text = "\$$formateddata",
+                text = "\$$formattedData",
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center
