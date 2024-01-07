@@ -15,6 +15,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.splitandtipcalculator.components.InputField
 import com.example.splitandtipcalculator.ui.theme.SplitAndTipCalculatorTheme
 
 class MainActivity : ComponentActivity() {
@@ -50,16 +53,7 @@ fun My_app(){
 
             TopHeader(134.134)
 
-            Surface(modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .padding(16.dp),
-                shape = RoundedCornerShape(12.dp),
-                //shadowElevation = 4.dp,
-                border = BorderStroke(1.dp,Color.Gray)
-            ) {
-
-            }
+            Bottom_panel()
 
 
 
@@ -72,6 +66,48 @@ fun My_app(){
 
 
 
+}
+
+@Composable
+private fun Bottom_panel() {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .padding(16.dp),
+        shape = RoundedCornerShape(12.dp),
+        //shadowElevation = 4.dp,
+        border = BorderStroke(1.dp, Color.Gray)
+    ) {
+
+        val curr  = remember {
+            mutableStateOf("")
+        }
+
+        Column(modifier = Modifier.fillMaxSize()) {
+
+            Column(modifier = Modifier.fillMaxSize()) {
+
+                InputField(
+                    valueState = curr,
+                    labelId = "hello",
+                    enable = true,
+                    singleLine = true
+                )
+
+
+
+            }
+
+
+
+        }
+
+
+
+
+
+    }
 }
 
 @Composable
