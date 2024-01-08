@@ -1,7 +1,6 @@
 package com.example.splitandtipcalculator
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -33,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,23 +77,29 @@ fun My_app(){
             // Creating variable for use
             var split by remember { mutableIntStateOf(0) }
 
-            var billAmount = remember { mutableStateOf("") }
+            val billAmount = remember { mutableStateOf("") }
 
-            var changePerformedForInt = remember (billAmount){
+            val changePerformedForDouble = remember (billAmount){
                 derivedStateOf {
                     try {
-                        billAmount.value.toInt()
+                        billAmount.value.toDouble()
                     } catch (e:NumberFormatException){
                         0
                     }
                 }
             }
 
+            val perPersonValue = remember (changePerformedForDouble,split){
+                derivedStateOf { (if (split>0 ) changePerformedForDouble.value.toDouble()/split.toDouble() else changePerformedForDouble.value.toDouble()) }
+            }
+
+
+
 
             // Ok now work is on
 
 
-            TopHeader(134.555)
+            TopHeader(perPersonValue = perPersonValue.value)
 
 
             Bottom_panel(split = split, onUpdateSplit = { updatedSplit ->
@@ -121,9 +127,6 @@ fun My_app(){
 
 }
 
-fun ankit (curr : MutableState<String>){
-    Log.d("tt", curr.value)
-}
 
 
 @Composable
@@ -243,7 +246,7 @@ private fun InputTextField(billAmount: MutableState<String>,billAmountUpdate: (S
 
 
 @Composable
-private fun TopHeader(perPersonValue:Double= 0.0) {
+private fun TopHeader(perPersonValue:Double=0.0) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
