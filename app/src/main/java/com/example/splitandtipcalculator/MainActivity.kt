@@ -110,7 +110,7 @@ fun ankit (curr : MutableState<String>){
 
 
 @Composable
-private fun Bottom_panel(split : Int, onUpdateSplit:(Int)->Unit, billAmount:MutableState<String>, billAmountUpdate:(Int)->Unit) {
+private fun Bottom_panel(split : Int, onUpdateSplit:(Int)->Unit, billAmount:MutableState<String>, billAmountUpdate:(String)->Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -204,7 +204,7 @@ private fun Plush_minusIcon(imageVector: ImageVector,onClick : ()->Unit) {
 
 
 @Composable
-private fun InputTextField(billAmount: MutableState<String>,billAmountUpdate: (Int) -> Unit) {
+private fun InputTextField(billAmount: MutableState<String>,billAmountUpdate: (String) -> Unit) {
     val curr = remember {
         mutableStateOf("")
     }
@@ -216,7 +216,7 @@ private fun InputTextField(billAmount: MutableState<String>,billAmountUpdate: (I
         enable = true,
         singleLine = true,
         placeholder = "Enter your bill amount",
-        onAction = KeyboardActions { if (curr.value.trim().isNotEmpty()) billAmountUpdate(billAmount.value.toInt()) }
+        onAction = KeyboardActions { if (curr.value.trim().isNotEmpty()) billAmountUpdate(billAmount.value) }
     )
 }
 
