@@ -31,6 +31,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.splitandtipcalculator.components.InputField
 import com.example.splitandtipcalculator.ui.theme.SplitAndTipCalculatorTheme
+import java.lang.NumberFormatException
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,9 +73,24 @@ fun My_app(){
 
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
+
+            // Creating variable for use
             var split by remember { mutableIntStateOf(0) }
 
             var billAmount = remember { mutableStateOf("") }
+
+            var changePerformedForInt = remember (billAmount){
+                derivedStateOf {
+                    try {
+                        billAmount.value.toInt()
+                    } catch (e:NumberFormatException){
+                        0
+                    }
+                }
+            }
+
+
+            // Ok now work is on
 
 
             TopHeader(134.555)
@@ -88,8 +105,8 @@ fun My_app(){
                 }
                 },
                 billAmount = billAmount,
-                billAmountUpdate = {newamount->
-                    billAmount.value = newamount.toString()
+                billAmountUpdate = {newAmount->
+                    billAmount.value = newAmount.toString()
 
                 }
             )
