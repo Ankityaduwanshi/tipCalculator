@@ -1,7 +1,6 @@
 package com.example.splitandtipcalculator
 
 import android.os.Bundle
-import android.service.autofill.OnClickAction
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -41,11 +40,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -75,18 +72,25 @@ fun My_app(){
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             var split by remember { mutableIntStateOf(0) }
+
+            var billAmount = remember { mutableStateOf("") }
+
+
             TopHeader(134.555)
 
 
-
-
-            Bottom_panel(split = split, onupdate = {updatedSplit ->
+            Bottom_panel(split = split, onUpdateSplit = { updatedSplit ->
                 if (split==0 && updatedSplit == split-1){
                     split = 0
                 }
                 else{
                     split = updatedSplit
                 }
+                },
+                billAmount = billAmount,
+                billAmountUpdate = {newamount->
+                    billAmount.value = newamount.toString()
+
                 }
             )
 
@@ -106,7 +110,7 @@ fun ankit (curr : MutableState<String>){
 
 
 @Composable
-private fun Bottom_panel(split : Int , onupdate:(Int)->Unit) {
+private fun Bottom_panel(split : Int, onUpdateSplit:(Int)->Unit, billAmount:MutableState<String>, billAmountUpdate:(Int)->Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -119,8 +123,8 @@ private fun Bottom_panel(split : Int , onupdate:(Int)->Unit) {
 
         Column(modifier = Modifier.fillMaxSize()) {
 
-            InputTextField()
-            splitRowCreator(onupdate, split)
+            InputTextField(billAmount = billAmount, billAmountUpdate = billAmountUpdate)
+            SplitRowCreator(onUpdateSplit, split)
 
 
 
@@ -134,7 +138,7 @@ private fun Bottom_panel(split : Int , onupdate:(Int)->Unit) {
 }
 
 @Composable
-private fun splitRowCreator(onupdate: (Int) -> Unit, split: Int) {
+private fun SplitRowCreator(onUpdate: (Int) -> Unit, split: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -152,7 +156,7 @@ private fun splitRowCreator(onupdate: (Int) -> Unit, split: Int) {
         ) {
 
             Plush_minusIcon(imageVector = Icons.Rounded.Remove) {
-                onupdate(split - 1)
+                onUpdate(split - 1)
             }
 
             Text(
@@ -166,7 +170,7 @@ private fun splitRowCreator(onupdate: (Int) -> Unit, split: Int) {
             )
 
             Plush_minusIcon(imageVector = Icons.Rounded.Add) {
-                onupdate(split + 1)
+                onUpdate(split + 1)
             }
 
 
@@ -200,19 +204,19 @@ private fun Plush_minusIcon(imageVector: ImageVector,onClick : ()->Unit) {
 
 
 @Composable
-private fun InputTextField() {
+private fun InputTextField(billAmount: MutableState<String>,billAmountUpdate: (Int) -> Unit) {
     val curr = remember {
         mutableStateOf("")
     }
 
 
     InputField(
-        valueState = curr,
+        valueState = billAmount,
         labelId = "Bill Amount",
         enable = true,
         singleLine = true,
         placeholder = "Enter your bill amount",
-        onAction = KeyboardActions { if (curr.value.trim().isNotEmpty()) ankit(curr) }
+        onAction = KeyboardActions { if (curr.value.trim().isNotEmpty()) billAmountUpdate(billAmount.value.toInt()) }
     )
 }
 
