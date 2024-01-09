@@ -32,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -59,7 +57,6 @@ class MainActivity : ComponentActivity() {
                 My_app()
 
 
-
             }
         }
     }
@@ -67,33 +64,31 @@ class MainActivity : ComponentActivity() {
 
 @Preview
 @Composable
-fun My_app(){
+fun My_app() {
     Surface(
         modifier = Modifier.fillMaxSize(),
 
-    ) {
+        ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
             // Creating variable for use
-            var split by remember { mutableIntStateOf(0) }
+            var split by remember { mutableIntStateOf(1) }
 
             val billAmount = remember { mutableStateOf("") }
 
-            val changePerformedForDouble = remember (billAmount){
+            val changePerformedForDouble = remember(billAmount) {
                 derivedStateOf {
                     try {
                         billAmount.value.toDouble()
-                    } catch (e:NumberFormatException){
+                    } catch (e: NumberFormatException) {
                         0
                     }
                 }
             }
 
-            val perPersonValue = remember (changePerformedForDouble,split){
-                derivedStateOf { (if (split>0 ) changePerformedForDouble.value.toDouble()/split.toDouble() else changePerformedForDouble.value.toDouble()) }
+            val perPersonValue = remember(changePerformedForDouble, split) {
+                derivedStateOf { (if (split > 0) changePerformedForDouble.value.toDouble() / split.toDouble() else changePerformedForDouble.value.toDouble()) }
             }
-
-
 
 
             // Ok now work is on
@@ -103,34 +98,34 @@ fun My_app(){
 
 
             Bottom_panel(split = split, onUpdateSplit = { updatedSplit ->
-                if (split==0 && updatedSplit == split-1){
-                    split = 0
+                split = if (split == 1 && updatedSplit == split - 1) {
+                    1
+                } else {
+                    updatedSplit
                 }
-                else{
-                    split = updatedSplit
-                }
-                },
+            },
                 billAmount = billAmount,
-                billAmountUpdate = {newAmount->
-                    billAmount.value = newAmount.toString()
+                billAmountUpdate = { newAmount ->
+                    billAmount.value = newAmount
 
                 }
             )
-
-
 
 
         }
     }
 
 
-
 }
 
 
-
 @Composable
-private fun Bottom_panel(split : Int, onUpdateSplit:(Int)->Unit, billAmount:MutableState<String>, billAmountUpdate:(String)->Unit) {
+private fun Bottom_panel(
+    split: Int,
+    onUpdateSplit: (Int) -> Unit,
+    billAmount: MutableState<String>,
+    billAmountUpdate: (String) -> Unit
+) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -144,13 +139,25 @@ private fun Bottom_panel(split : Int, onUpdateSplit:(Int)->Unit, billAmount:Muta
         Column(modifier = Modifier.fillMaxSize()) {
 
             InputTextField(billAmount = billAmount, billAmountUpdate = billAmountUpdate)
+
             SplitRowCreator(onUpdateSplit, split)
 
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Tip")
 
+                Text(text = "$33.0", modifier = Modifier.padding(end = 64.dp))
+
+
+            }
 
 
         }
-
 
 
     }
@@ -201,7 +208,7 @@ private fun SplitRowCreator(onUpdate: (Int) -> Unit, split: Int) {
 
 
 @Composable
-private fun Plush_minusIcon(imageVector: ImageVector,onClick : ()->Unit) {
+private fun Plush_minusIcon(imageVector: ImageVector, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .wrapContentSize()
@@ -209,7 +216,8 @@ private fun Plush_minusIcon(imageVector: ImageVector,onClick : ()->Unit) {
 
         shape = CircleShape,
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary)
     ) {
 
         Icon(
@@ -224,7 +232,7 @@ private fun Plush_minusIcon(imageVector: ImageVector,onClick : ()->Unit) {
 
 
 @Composable
-private fun InputTextField(billAmount: MutableState<String>,billAmountUpdate: (String) -> Unit) {
+private fun InputTextField(billAmount: MutableState<String>, billAmountUpdate: (String) -> Unit) {
     val curr = remember {
         mutableStateOf("")
     }
@@ -236,25 +244,23 @@ private fun InputTextField(billAmount: MutableState<String>,billAmountUpdate: (S
         enable = true,
         singleLine = true,
         placeholder = "Enter your bill amount",
-        onAction = KeyboardActions { if (curr.value.trim().isNotEmpty()) billAmountUpdate(billAmount.value) }
+        onAction = KeyboardActions {
+            if (curr.value.trim().isNotEmpty()) billAmountUpdate(billAmount.value)
+        }
     )
 }
 
 
-
-
-
-
 @Composable
-private fun TopHeader(perPersonValue:Double=0.0) {
+private fun TopHeader(perPersonValue: Double = 0.0) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(2f / 1f)
             .padding(24.dp, 28.dp, 24.dp, 0.dp),
         shape = RoundedCornerShape(12.dp),
-        color = colorResource(id = R.color.boxcolor),
-       // shadowElevation = 1.dp,
+        color = MaterialTheme.colorScheme.primaryContainer,
+        // shadowElevation = 1.dp,
         //tonalElevation = 4.dp
     ) {
         Column(

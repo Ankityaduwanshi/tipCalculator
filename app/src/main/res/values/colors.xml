@@ -8,4 +8,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="boxcolor">#FFE9D7F7</color>
+    <color name="CreatedColor">#ffc9d8</color>
+    <color name="Created">#ebdcff</color>
 </resources>
