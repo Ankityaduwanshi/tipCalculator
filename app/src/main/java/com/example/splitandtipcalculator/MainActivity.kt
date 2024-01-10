@@ -26,12 +26,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import com.example.splitandtipcalculator.components.InputField
 import com.example.splitandtipcalculator.ui.theme.SplitAndTipCalculatorTheme
 import java.lang.NumberFormatException
+import kotlin.math.round
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,11 +89,25 @@ fun My_app() {
                 }
             }
 
-            val perPersonValue = remember(changePerformedForDouble, split) {
-                derivedStateOf { (if (split > 0) changePerformedForDouble.value.toDouble() / split.toDouble() else changePerformedForDouble.value.toDouble()) }
+            var sliderValue by remember { mutableFloatStateOf(0f) }
+
+
+            val tipValue = remember(changePerformedForDouble,sliderValue) {
+                derivedStateOf {
+                    changePerformedForDouble.value.toDouble()*(round(sliderValue)/100)
+                }
             }
 
 
+
+            val perPersonValue = remember(changePerformedForDouble, split) {
+                derivedStateOf {
+                    (if (split > 0){
+                        (changePerformedForDouble.value.toDouble() + tipValue.value) / split.toDouble()
+                    }else {
+                        changePerformedForDouble.value.toDouble()
+                    }) }
+            }
             // Ok now work is on
 
 
@@ -107,8 +124,13 @@ fun My_app() {
                 billAmount = billAmount,
                 billAmountUpdate = { newAmount ->
                     billAmount.value = newAmount
+                },
+                sliderValue = sliderValue,
+                sliderValueUpdate = {
+                    sliderValue = it
+                },
+                tipValue = tipValue.value
 
-                }
             )
 
 
@@ -124,7 +146,10 @@ private fun Bottom_panel(
     split: Int,
     onUpdateSplit: (Int) -> Unit,
     billAmount: MutableState<String>,
-    billAmountUpdate: (String) -> Unit
+    billAmountUpdate: (String) -> Unit,
+    sliderValue:Float,
+    sliderValueUpdate: (Float)->Unit,
+    tipValue : Double
 ) {
     Surface(
         modifier = Modifier
@@ -142,19 +167,24 @@ private fun Bottom_panel(
 
             SplitRowCreator(onUpdateSplit, split)
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "Tip")
+            TipRowCreator(tipValue)
 
-                Text(text = "$33.0", modifier = Modifier.padding(end = 64.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Text(text = "${round(sliderValue).toInt()} %")
+            }
 
+            Row {
+                Slider(value = sliderValue,
+                    onValueChange =sliderValueUpdate,
+                    modifier = Modifier.wrapContentSize(),
+                    valueRange = 0.0f..100.0f )
 
             }
+
+
+
+
+
 
 
         }
@@ -162,6 +192,25 @@ private fun Bottom_panel(
 
     }
 
+}
+
+@Composable
+private fun TipRowCreator(tipValue:Double) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = "Tip")
+
+        val tipValueFormation = "%.2f".format(tipValue)
+
+        Text(text = "\$$tipValueFormation", modifier = Modifier.padding(end = 64.dp))
+
+
+    }
 }
 
 @Composable
